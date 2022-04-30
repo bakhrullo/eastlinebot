@@ -86,7 +86,7 @@ async def subchanneldone(message: types.Message):
 @dp.message_handler(content_types=['photo'], state=Form.QR_catch)
 async def handle_docs_photo(message: types.Message):
     await message.photo[-1].download('qr/test.jpg')
-    await bot.send_message(message.from_user.id, qr_decode.decoderv2())
+    await bot.send_message(message.from_user.id, qr_decode.decoder())
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
