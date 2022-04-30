@@ -7,6 +7,7 @@ import keys as nav
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram import Bot, Dispatcher, executor, types
 
+
 API_TOKEN = '5342616434:AAH6urtpWE53qFi657huUlesapo62o2aTvQ'
 CHANNEL_ID = '@testchannelforcoolbot'
 
@@ -85,7 +86,7 @@ async def subchanneldone(message: types.Message):
 @dp.message_handler(content_types=['photo'], state=Form.QR_catch)
 async def handle_docs_photo(message: types.Message):
     await message.photo[-1].download('qr/test.jpg')
-    await bot.send_message(message.from_user.id, qr_decode.decoder())
+    await bot.send_message(message.from_user.id, qr_decode.decoderv2())
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
