@@ -1,7 +1,7 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 
-btnUrlChannel = InlineKeyboardButton(text='подписаться нахооой', url='https://t.me/testchannelforcoolbot')
-btnDoneSub = InlineKeyboardButton(text='подписался нахоооой', callback_data='subchanneldone')
+btnUrlChannel = InlineKeyboardButton(text='подписаться', url='https://t.me/testchannelforcoolbot')
+btnDoneSub = InlineKeyboardButton(text='подписался', callback_data='subchanneldone')
 btnUrlInsta = InlineKeyboardButton(text='тепрь подписаться на инсту нахооой',
                                    url='https://www.instagram.com/fatkhullaev_b/')
 btnCashBack = InlineKeyboardButton(text='получить кешбек', callback_data='cashbackdone',)
