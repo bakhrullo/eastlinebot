@@ -11,7 +11,7 @@ from aiogram import Bot, Dispatcher, executor, types
 API_TOKEN = '5342616434:AAH6urtpWE53qFi657huUlesapo62o2aTvQ'
 CHANNEL_ID = '@testchannelforcoolbot'
 
-# Configure logging
+# Configure logging for
 
 logging.basicConfig(level=logging.INFO)
 
