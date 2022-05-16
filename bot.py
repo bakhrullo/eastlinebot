@@ -2,13 +2,15 @@ import logging
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
 import insta
-import qr_decode
+import qr_decode, info
 import keys as nav
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram import Bot, Dispatcher, executor, types
+import aiohttp
+import requests
 
-
-API_TOKEN = '5342616434:AAH6urtpWE53qFi657huUlesapo62o2aTvQ'
+INFO_POST = 'http://127.0.0.1:8000/voice/'
+API_TOKEN = ''
 CHANNEL_ID = '@testchannelforcoolbot'
 
 # Configure logging for
@@ -19,6 +21,10 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
 
+markdown = """
+    *bold text*
+    _italic text_
+    [text](URL"""
 
 class Form(StatesGroup):
     Get_contact = State() #Задаем состояние
@@ -50,10 +56,20 @@ async def contact(message):
         await bot.send_message(message.from_user.id, 'Для получения кешбека нажмите на кнопку',
                                reply_markup=nav.cashBack)
         global phone_number
-        phone_number = str(message.contact.phone_number)
-        user_id = str(message.contact.user_id)
-        print(phone_number, user_id)
+        phone_number = message.contact.phone_number
+        user_id = int(message.contact.user_id)
+        # print(phone_number, user_id)
+        cash = int(12124)
+        # requests.post('http://127.0.0.1:8000/user', data={'tgUserId': user_id, 'phone': phone_number})
+        print(phone_number)
     await Form.next()
+
+
+async def info_post():
+    async with aiohttp.ClientSession as session:
+        async with session.post(INFO_POST) as response:
+
+            return await response.json()
 
 
 @dp.callback_query_handler(text='cashbackdone', state=Form.Cash_back)
@@ -86,7 +102,33 @@ async def subchanneldone(message: types.Message):
 @dp.message_handler(content_types=['photo'], state=Form.QR_catch)
 async def handle_docs_photo(message: types.Message):
     await message.photo[-1].download('qr/test.jpg')
-    await bot.send_message(message.from_user.id, qr_decode.decoder())
+    payload = qr_decode.decoder()
+    print(payload)
+
+    if len(payload) < 15:
+        parss = {'inVoiceId': int(payload)}
+        # await bot.send_message(message.from_user.id, qr_decode.decoder())
+        r = requests.get('http://127.0.0.1:8000/invoice', params=parss)
+        if len(r.text) > 10:
+            await bot.send_message(message.from_user.id, 'За этот накладной кэшбэк получен, отправь другой накладной', parse_mode="Markdown")
+        else:
+            url = f'https://express.eastline.uz/api/bot/get-cashback-info/{payload}'
+            r = requests.get(url, params=payload)
+            user_id = int(message.from_user.id)
+            json = r.json()
+            requests.post('http://127.0.0.1:8000/user/myapp/', data={'phone': json['sender_phone'],
+                                                                    'tgUserId' : user_id,
+                                                                    'inVoiceId': payload,
+                                                                    'price': json['cost_of_service_with_vat'],
+                                                                    'name': json['sender_name'],
+                                                                    'cashBack': json['cashback']})
+            await bot.send_message(message.from_user.id, f'Кешбек получен успешно. Ваш кешбек:{ str(json["cashback"]) } UZS { str(json["sender_phone"]) } { str(json["cost_of_service_with_vat"]) }, { str(json["sender_name"]) }')
+    else:
+        await bot.send_message(message.from_user.id, payload, parse_mode="Markdown")
+
+    # print(r.text)
+    # print(r.url)
+    # await bot.send_message(message.from_user.id, r.text)
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
