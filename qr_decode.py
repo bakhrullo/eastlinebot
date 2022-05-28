@@ -1,13 +1,7 @@
 from pyzbar.pyzbar import decode
 from PIL import Image
+import os
 
-
-
-a = 235325
-print(type(a))
-c = 23323
-if type(a) == type(c):
-    print('lets goo')
 
 # import sys, qrcode
 # from qrcode import QRCode
@@ -49,12 +43,13 @@ if type(a) == type(c):
 #         error = 'отправьте более четкое фото'
 #         return error
 
-def decoder():
+def decoder(name):
     try:
-        decocdeQR = decode(Image.open('qr/test.jpg'))
-        print(decocdeQR[0].data.decode('ascii'))
-        code = decocdeQR[0].data.decode('ascii')
-        int(code)
+        decode_qr = decode(Image.open(f'test/{name}.jpg'))
+        print(decode_qr[0].data.decode('ascii'))
+        code = decode_qr[0].data.decode('ascii')
+        print(int(code))
+        os.remove(f'test/{name}.jpg')
         return code
 
     except:
