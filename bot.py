@@ -10,7 +10,7 @@ import asyncRequests
 from aiogram.dispatcher import FSMContext
 
 API_TOKEN = '5342616434:AAH6urtpWE53qFi657huUlesapo62o2aTvQ'
-CHANNEL_ID = '@testchannelforcoolbot'
+CHANNEL_ID = '@Eastline_express_uzb'
 # Configure logging for
 
 logging.basicConfig(level=logging.INFO)

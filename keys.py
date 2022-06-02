@@ -1,6 +1,6 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 
-btnUrlChannel = InlineKeyboardButton(text='Подписаться', url='https://t.me/testchannelforcoolbot')
+btnUrlChannel = InlineKeyboardButton(text='Подписаться', url='https://t.me/Eastline_express_uzb')
 btnDoneSub = InlineKeyboardButton(text='Подписался', callback_data='subchanneldone')
 btnUrlInsta = InlineKeyboardButton(text='Тепрь подписаться на инсту нахооой',
                                    url='https://www.instagram.com/fatkhullaev_b/')
