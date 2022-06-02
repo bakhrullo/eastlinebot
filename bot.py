@@ -9,7 +9,7 @@ from aiogram import Bot, Dispatcher, executor, types
 import asyncRequests
 from aiogram.dispatcher import FSMContext
 
-API_TOKEN = ''
+API_TOKEN = '5342616434:AAH6urtpWE53qFi657huUlesapo62o2aTvQ'
 CHANNEL_ID = '@testchannelforcoolbot'
 # Configure logging for
 
@@ -56,12 +56,13 @@ async def send_welcome(message: types.Message):
 
 
 @dp.message_handler(content_types=['contact'], state=Form.Get_contact)
-async def contact(message, state=FSMContext):
+async def contact(message):
     if message.contact is not None:
         keyboard2 = types.ReplyKeyboardRemove()
         pk = message.chat.id
         phone_number = '+' + message.contact.phone_number
-        print(await asyncRequests.contact_create(chat_id=pk, number=phone_number))
+        print(phone_number)
+        await asyncRequests.contact_create(chat_id=pk, number=phone_number)
         await bot.send_message(message.chat.id, 'Вы успешно отправили свой номер, cпасибо вы зарегистрированы',
                                reply_markup=keyboard2)
         await bot.send_message(message.from_user.id, 'Меню:',
