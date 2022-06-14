@@ -159,7 +159,8 @@ async def balancedone(message: types.Message):
         else:
             await bot.send_message(message.from_user.id, f"👤 Имя: {resp['name']} \n"
                                                          f"📲 Номер: {resp['phone']} \n"
-                                                         f"💰 Баланс: {resp['cashback']} UZS", reply_markup=keys.back)
+                                                         f"💰 Баланс: {resp['cashback']} UZS \n"
+                                                         f"🆔 Ваш ID: {pk}", reply_markup=keys.back)
     else:
         await bot.send_message(message.from_user.id, '😉 Для начала подпишитесь на наш Telegram-канал', reply_markup=nav.checkSubMenu)
 
