@@ -53,6 +53,6 @@ def decoder(name):
         return code
 
     except:
-        word = 'отправьте более четкое фото'
+        word = '❌ Отправьте отчётливое фото'
         str(word)
         return word

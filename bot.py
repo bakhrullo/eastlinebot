@@ -44,13 +44,13 @@ async def send_welcome(message: types.Message):
     user_num = await asyncRequests.user_chat_id(pk)
     print(len(user_num))
     if len(user_num) > 0:
-        await bot.send_message(message.from_user.id, 'Меню:',
+        await bot.send_message(message.from_user.id, '🤔 С чего начнём?',
                                reply_markup=nav.cashBack)
         await Form.Menu.set()
     else:
-        await bot.send_message(message.from_user.id,
-                               'Добро пожаловать!  Этот бот для получения кешбека от суммы накладной.'
-                               ' Отправьте свой номер боту для регистрации',
+        await bot.send_message(message.from_user.id, 'Добро пожаловать в Eastline Express Bot! 🤗 '
+                                                     'Этот бот создан для получения кэшбэка от суммы накладной.'
+                                                     'Отправьте свой контакт боту для регистрации 📲',
                                reply_markup=nav.markup_requests)
         await Form.Get_contact.set()
 
@@ -60,15 +60,16 @@ async def contact(message):
     if message.contact is not None:
         keyboard2 = types.ReplyKeyboardRemove()
         pk = message.chat.id
-        phone_number = '+' + message.contact.phone_number
-        print(phone_number)
-        await asyncRequests.contact_create(chat_id=pk, number=phone_number)
-        await bot.send_message(message.chat.id, 'Вы успешно отправили свой номер, cпасибо вы зарегистрированы',
-                               reply_markup=keyboard2)
-        await bot.send_message(message.from_user.id, 'Меню:',
-                               reply_markup=nav.cashBack)
+        if len(message.contact.phone_number) == 12:
+            phone_number = '+' + message.contact.phone_number
+            print(len(phone_number))
+            await asyncRequests.contact_create(chat_id=pk, number=phone_number)
+            await bot.send_message(message.chat.id, 'Вы успешно отправили свой контакт! Спасибо за регистрацию 🤩',
+                                   reply_markup=keyboard2)
+            await bot.send_message(message.from_user.id, '🤔 С чего начнём?',
+                                   reply_markup=nav.cashBack)
 
-        await Form.next()
+            await Form.next()
 
     # if len(resp) < 4:
     #     await bot.send_message(message.from_user.id, 'вы ещё не получали кешбек', reply_markup=keys.balanceBack)
@@ -101,7 +102,8 @@ async def handle_docs_photo(message: types.Message, state=FSMContext):
         print(len(r))
 
         if len(r) == 1:
-            await bot.send_message(message.from_user.id, 'За этот накладной кэшбэк получен, отправь другой накладной',
+            await bot.send_message(message.from_user.id, '😔 Кэшбэк за эту накладную уже получен.'
+                                                         ' Отправьте другой QR-код',
                                    reply_markup=keys.back)
         else:
             pk = message.chat.id
@@ -111,13 +113,13 @@ async def handle_docs_photo(message: types.Message, state=FSMContext):
             resp = await asyncRequests.get_cashback(order_id=payload, chat_id=pk, name=name, phone=us)
             ress = await asyncRequests.invoice_create(chat_id=resp['telegram_chat_id'], number=resp['order_id'])
             print(resp)
-            await bot.send_message(message.from_user.id, f'Кешбек получен успешно. \n'
-                                                         f'Номер заказа: {resp["order_id"]} \n'
-                                                         f'Имя заказчика: {resp["sender_name"]} \n'
-                                                         f'Номер заказчик: {resp["sender_phone"]} \n'
-                                                         f'Стоимость заказа: {resp["cost_of_service_with_vat"]} UZS\n'
-                                                         f'Ваш кешбек: {resp["cashback"]} UZS \n'
-                                                         f'Процент: {resp["percent"]}',
+            await bot.send_message(message.from_user.id, f'🥳 Поздравляем! Кэшбэк получен успешно!.\n'
+                                                         f'📦 Номер заказа: {resp["order_id"]} \n'
+                                                         f'👤 Имя заказчика: {resp["sender_name"]} \n'
+                                                         f'📲 Номер заказчик: {resp["sender_phone"]} \n'
+                                                         f'💵 Стоимость заказа: {resp["cost_of_service_with_vat"]} UZS\n'
+                                                         f'💸 Начисленная сумма: {resp["cashback"]} UZS \n'
+                                                         f'🤩 Процент кэшбэка: {resp["percent"]}',
                                    reply_markup=keys.back)
 
 
@@ -135,42 +137,36 @@ async def handle_docs_photo(message: types.Message, state=FSMContext):
 #                                                 OBRABOTKA KNOPOK
 
 
-@dp.callback_query_handler(text='cashbackdone', state=Form.Menu)
+@dp.message_handler(lambda message: message.text == "💸 Получить кэшбэк", state=Form.Menu)
 async def cashbackdone(message: types.Message):
     if check_sub_channel(await bot.get_chat_member(chat_id=CHANNEL_ID, user_id=message.from_user.id)):
-        await bot.delete_message(message.from_user.id, message.message.message_id)
-        await bot.send_message(message.from_user.id, 'Отправьте фотографию QR кода из накладной',
+        # await bot.delete_message(message.from_user.id, message.message.message_id)
+        await bot.send_message(message.from_user.id, 'Отправьте фото QR-кода вашей накладной 📷',
                                reply_markup=keys.back)
         await Form.QR_catch.set()
     else:
-        await bot.send_message(message.from_user.id, 'Подпишитесь на наш телеграм канал', reply_markup=nav.checkSubMenu)
-        # await bot.send_message(message.from_user.id, 'моладец что подписался, теперь подпишись на инсту',
-        #                        reply_markup=nav.checkInstMenu)
-        # await Form.peremennaya.set()
-        # print(message.text)
+        await bot.send_message(message.from_user.id, '😉 Для начала подпишитесь на наш Telegram-канал',
+                               reply_markup=nav.checkSubMenu)
 
 
-@dp.callback_query_handler(text='balancedone', state=Form.Menu)
+@dp.message_handler(lambda message: message.text == "👤 Профиль", state=Form.Menu)
 async def balancedone(message: types.Message):
     if check_sub_channel(await bot.get_chat_member(chat_id=CHANNEL_ID, user_id=message.from_user.id)):
-        await bot.delete_message(chat_id=message.from_user.id, message_id=message.message.message_id)
-        keyboard2 = types.ReplyKeyboardRemove()
         pk = message.from_user.id
         resp = await asyncRequests.get_balance(pk)
         if len(resp) < 4:
-            await bot.send_message(message.from_user.id, 'Вы ещё не получали кешбек', reply_markup=keys.back)
+            await bot.send_message(message.from_user.id, '🥲 Вы ещё не получили кэшбэк.', reply_markup=keys.back)
         else:
-            await bot.send_message(message.from_user.id, f"Имя: {resp['name']} \n"
-                                                         f"Номер: {resp['phone']} \n"
-                                                         f"Баланс: {resp['cashback']} UZS", reply_markup=keys.back)
+            await bot.send_message(message.from_user.id, f"👤 Имя: {resp['name']} \n"
+                                                         f"📲 Номер: {resp['phone']} \n"
+                                                         f"💰 Баланс: {resp['cashback']} UZS", reply_markup=keys.back)
     else:
-        await bot.send_message(message.from_user.id, 'Подпишитесь на наш телеграм канал', reply_markup=nav.checkSubMenu)
+        await bot.send_message(message.from_user.id, '😉 Для начала подпишитесь на наш Telegram-канал', reply_markup=nav.checkSubMenu)
 
 
-@dp.callback_query_handler(text='historydone', state=Form.Menu)
+@dp.message_handler(lambda message: message.text == "📄 История транзакций", state=Form.Menu)
 async def historydone(message: types.Message):
     if check_sub_channel(await bot.get_chat_member(chat_id=CHANNEL_ID, user_id=message.from_user.id)):
-        await bot.delete_message(chat_id=message.from_user.id, message_id=message.message.message_id)
         pk = message.from_user.id
         try:
             resp = await asyncRequests.get_history(pk)
@@ -179,23 +175,22 @@ async def historydone(message: types.Message):
             for i in data:
                 word = i['created_at']
                 remove_last = word[:-17]
-                answer = f"Номер заказа: {i['order_id']},  \n" \
-                         f"Кешбек: {i['cashback']} UZS,  \n" \
-                         f"Время: {remove_last}"
+                answer = f"📦Номер заказа: {i['order_id']},  \n" \
+                         f"💸Кэшбэк: {i['cashback']} UZS,  \n" \
+                         f"🕑Время: {remove_last}"
                 ans = str(answer) + '.\n\n' + ans
                 # await bot.send_message(message.from_user.id, answer)
             await bot.send_message(message.from_user.id, text=ans, reply_markup=keys.back)
             print(ans)
         except:
-            await bot.send_message(message.from_user.id, 'вы ещё не получали кешбек', reply_markup=keys.back)
+            await bot.send_message(message.from_user.id, '🥲 Вы ещё не получили кэшбэк.', reply_markup=keys.back)
     else:
-        await bot.send_message(message.from_user.id, 'Подпишитесь на наш телеграм канал', reply_markup=nav.checkSubMenu)
+        await bot.send_message(message.from_user.id, '😉 Для начала подпишитесь на наш Telegram-канал', reply_markup=nav.checkSubMenu)
 
 
-@dp.callback_query_handler(text='back', state='*')
+@dp.message_handler(lambda message: message.text == '🔙 Назад', state='*')
 async def back_done(message: types.Message):
-    await bot.delete_message(chat_id=message.from_user.id, message_id=message.message.message_id)
-    await bot.send_message(message.from_user.id, 'Меню:', reply_markup=keys.cashBack)
+    await bot.send_message(message.from_user.id, '🤔 С чего начнём?', reply_markup=keys.cashBack)
     await Form.Menu.set()
 
 

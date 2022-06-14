@@ -1,29 +1,29 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 
-btnUrlChannel = InlineKeyboardButton(text='Подписаться', url='https://t.me/Eastline_express_uzb')
-btnDoneSub = InlineKeyboardButton(text='Подписался', callback_data='subchanneldone')
-btnUrlInsta = InlineKeyboardButton(text='Тепрь подписаться на инсту нахооой',
+btnUrlChannel = InlineKeyboardButton(text='Сейчас подпишусь 👌', url='https://t.me/Eastline_express_uzb')
+btnDoneSub = InlineKeyboardButton(text='Уже подписан 😏', callback_data='subchanneldone')
+btnUrlInsta = InlineKeyboardButton(text='Тепрь подписаться на инсту',
                                    url='https://www.instagram.com/fatkhullaev_b/')
-btnCashBack = InlineKeyboardButton(text='Получить кешбек', callback_data='cashbackdone',)
-btnBalance = InlineKeyboardButton(text='Профил', callback_data='balancedone',)
-btnHistory = InlineKeyboardButton(text='История', callback_data='historydone',)
+btnCashBack = KeyboardButton(text='💸 Получить кэшбэк')
+btnBalance = KeyboardButton(text='👤 Профиль')
+btnHistory = KeyboardButton(text='📄 История транзакций')
 # btnBackBalance = InlineKeyboardButton(text='назад', callback_data='backdonebalance',)
 # btnBackHistory = InlineKeyboardButton(text='назад', callback_data='backdonehistory',)
 # btnBackCashback = InlineKeyboardButton(text='назад', callback_data='backdonecashback',)
-btnBack = InlineKeyboardButton(text='Назад', callback_data='back',)
+btnBack = KeyboardButton(text='🔙 Назад', callback_data='back',)
 
-back = InlineKeyboardMarkup(row_width=1)
-cashBack = InlineKeyboardMarkup(row_with=1)
+back = ReplyKeyboardMarkup(resize_keyboard=True)
+cashBack = ReplyKeyboardMarkup(resize_keyboard=True)
 checkSubMenu = InlineKeyboardMarkup(row_width=1)
 checkInstMenu = InlineKeyboardMarkup(row_with=1)
 
 checkSubMenu.insert(btnUrlChannel)
 checkSubMenu.insert(btnDoneSub)
 checkInstMenu.insert(btnUrlInsta)
-cashBack.add(btnCashBack)
-cashBack.add(btnBalance)
-cashBack.add(btnHistory)
-back.insert(btnBack)
+cashBack.insert(btnCashBack)
+cashBack.insert(btnBalance)
+cashBack.insert(btnHistory)
+back.add(btnBack)
 
 markup_requests = ReplyKeyboardMarkup(resize_keyboard=True).add(KeyboardButton('Отправить свой контакт',
                                                                                request_contact=True))
