@@ -135,13 +135,13 @@ async def balancedone(message: types.Message):
             # qr_decode.qr_generate(message.from_user.id)
             img = qrcode.make(pk)
             type(img)  # qrcode.image.pil.PilImage
-            img.save(f"test/{pk}.png")
-            photo = InputFile(f"test/{pk}.png")
+            img.save(f"qr_gens/{pk}.png")
+            photo = InputFile(f"qr_gens/{pk}.png")
             await bot.send_photo(message.from_user.id, photo, caption=f"👤 Имя: {resp['name']} \n"
                                                                       f"📲 Номер: {resp['phone']} \n"
                                                                       f"💰 Баланс: {resp['cashback']} UZS \n"
                                                                       f"🆔 Ваш ID: {pk}", reply_markup=keys.back)
-            os.remove(f"test/{message.from_user.id}.png")
+            os.remove(f"qr_gens/{pk}.png")
     else:
         await bot.send_message(message.from_user.id, '😉 Для начала подпишитесь на наш Telegram-канал',
                                reply_markup=nav.checkSubMenu)
