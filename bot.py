@@ -9,6 +9,7 @@ import keys as nav
 import asyncRequests
 import logging
 import os
+import qrcode
 # bot19 = '1654773730:AAEh7aKHZIm3q1w6_MEET9RrxRfhE0GxDpU'
 east = '5342616434:AAH6urtpWE53qFi657huUlesapo62o2aTvQ'
 API_TOKEN = east
@@ -96,7 +97,7 @@ async def handle_docs_photo(message: types.Message, state=FSMContext):
                                                              ' 15.06.2022',
                                        reply_markup=keys.back)
             else:
-                ress = await asyncRequests.invoice_create(chat_id=resp['telegram_chat_id'], number=resp['order_id'])
+                await asyncRequests.invoice_create(chat_id=resp['telegram_chat_id'], number=resp['order_id'])
                 await bot.send_message(message.from_user.id, f'🥳 Поздравляем! Кэшбэк получен успешно!.\n'
                                                              f'📦 Номер заказа: {resp["order_id"]} \n'
                                                              f'👤 Имя заказчика: {resp["sender_name"]} \n'
@@ -131,8 +132,11 @@ async def balancedone(message: types.Message):
         if len(resp) < 4:
             await bot.send_message(message.from_user.id, '🥲 Вы ещё не получили кэшбэк.', reply_markup=keys.back)
         else:
-            qr_decode.qr_generate(message.from_user.id)
-            photo = InputFile(f"user_qr/{message.from_user.id}.png")
+            # qr_decode.qr_generate(message.from_user.id)
+            img = qrcode.make(pk)
+            type(img)  # qrcode.image.pil.PilImage
+            img.save(f"user_qr/{pk}.png")
+            photo = InputFile(f"user_qr/{pk}.png")
             await bot.send_photo(message.from_user.id, photo, caption=f"👤 Имя: {resp['name']} \n"
                                                                       f"📲 Номер: {resp['phone']} \n"
                                                                       f"💰 Баланс: {resp['cashback']} UZS \n"
