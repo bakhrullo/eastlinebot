@@ -42,8 +42,9 @@ def check_sub_channel(chat_member):
 async def send_welcome(message: types.Message):
     pk = message.chat.id
     user_num = await asyncRequests.user_chat_id(pk)
+    print(user_num)
     print(len(user_num))
-    if len(user_num) > 0:
+    if len(user_num) == 1:
         await bot.send_message(message.from_user.id, '🤔 С чего начнём?',
                                reply_markup=nav.cashBack)
         await Form.Menu.set()
@@ -55,21 +56,26 @@ async def send_welcome(message: types.Message):
         await Form.Get_contact.set()
 
 
-@dp.message_handler(content_types=['contact'], state=Form.Get_contact)
+@dp.message_handler(content_types=types.ContentType.CONTACT, state=Form.Get_contact)
 async def contact(message):
-    if message.contact is not None:
-        keyboard2 = types.ReplyKeyboardRemove()
-        pk = message.chat.id
-        if len(message.contact.phone_number) == 12:
-            phone_number = '+' + message.contact.phone_number
-            print(len(phone_number))
-            await asyncRequests.contact_create(chat_id=pk, number=phone_number)
-            await bot.send_message(message.chat.id, 'Вы успешно отправили свой контакт! Спасибо за регистрацию 🤩',
-                                   reply_markup=keyboard2)
-            await bot.send_message(message.from_user.id, '🤔 С чего начнём?',
-                                   reply_markup=nav.cashBack)
-
-            await Form.next()
+    print(len(message.contact.phone_number))
+    keyboard2 = types.ReplyKeyboardRemove()
+    pk = message.chat.id
+    if len(message.contact.phone_number) == 12:
+        phone_number = '+' + message.contact.phone_number
+        await asyncRequests.contact_create(chat_id=pk, number=phone_number)
+        await bot.send_message(message.chat.id, 'Вы успешно отправили свой контакт! Спасибо за регистрацию 🤩',
+                               reply_markup=keyboard2)
+        await bot.send_message(message.from_user.id, '🤔 С чего начнём?',
+                               reply_markup=nav.cashBack)
+        await Form.next()
+    elif len(message.contact.phone_number) == 13:
+        await asyncRequests.contact_create(chat_id=pk, number=message.contact.phone_number)
+        await bot.send_message(message.chat.id, 'Вы успешно отправили свой контакт! Спасибо за регистрацию 🤩',
+                               reply_markup=keyboard2)
+        await bot.send_message(message.from_user.id, '🤔 С чего начнём?',
+                               reply_markup=nav.cashBack)
+        await Form.next()
 
 
 @dp.message_handler(content_types=['photo'], state=Form.QR_catch)
