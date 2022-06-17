@@ -1,15 +1,17 @@
-import logging
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-# import insta
-import keys
-import qr_decode
-import keys as nav
+from aiogram.types import InputFile
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram import Bot, Dispatcher, executor, types
-import asyncRequests
 from aiogram.dispatcher import FSMContext
-
-API_TOKEN = '5342616434:AAH6urtpWE53qFi657huUlesapo62o2aTvQ'
+import qr_decode
+import keys
+import keys as nav
+import asyncRequests
+import logging
+import os
+# bot19 = '1654773730:AAEh7aKHZIm3q1w6_MEET9RrxRfhE0GxDpU'
+east = '5342616434:AAH6urtpWE53qFi657huUlesapo62o2aTvQ'
+API_TOKEN = east
 CHANNEL_ID = '@Eastline_express_uzb'
 # Configure logging for
 
@@ -25,9 +27,6 @@ dp = Dispatcher(bot, storage=storage)
 class Form(StatesGroup):
     Get_contact = State()
     Menu = State()
-    # Cash_back = State()
-    # Balance_check = State()
-    # History_check = State()
     QR_catch = State()
 
 
@@ -71,23 +70,6 @@ async def contact(message):
 
             await Form.next()
 
-    # if len(resp) < 4:
-    #     await bot.send_message(message.from_user.id, 'вы ещё не получали кешбек', reply_markup=keys.balanceBack)
-    # else:
-    #     await bot.send_message(message.from_user.id, f"{resp['name']}"
-    #                                                  f" {resp['phone']}"
-    #                                                  f" {resp['cashback']}", reply_markup=keys.balanceBack)
-
-
-# @dp.message_handler()
-# async def get_nick(message: types.Message):
-#     denser = insta.insta(message.text)
-#     if denser :
-#      markup = types.ReplyKeyboardRemove()
-# else:
-# await bot.send_message(message.from_user.id, 'моладец что подписался, теперь подпишись на инсту',
-#                        reply_markup=nav.checkInstMenu)
-
 
 @dp.message_handler(content_types=['photo'], state=Form.QR_catch)
 async def handle_docs_photo(message: types.Message, state=FSMContext):
@@ -100,7 +82,6 @@ async def handle_docs_photo(message: types.Message, state=FSMContext):
         parss = {'inVoiceId': int(payload)}
         r = await asyncRequests.check_invoice(invoice_id=parss)
         print(len(r))
-
         if len(r) == 1:
             await bot.send_message(message.from_user.id, '😔 Кэшбэк за эту накладную уже получен.'
                                                          ' Отправьте другой QR-код',
@@ -109,30 +90,23 @@ async def handle_docs_photo(message: types.Message, state=FSMContext):
             pk = message.chat.id
             user_num = await asyncRequests.user_chat_id(pk)
             us = user_num[0]['phone']
-
             resp = await asyncRequests.get_cashback(order_id=payload, chat_id=pk, name=name, phone=us)
-            ress = await asyncRequests.invoice_create(chat_id=resp['telegram_chat_id'], number=resp['order_id'])
-            print(resp)
-            await bot.send_message(message.from_user.id, f'🥳 Поздравляем! Кэшбэк получен успешно!.\n'
-                                                         f'📦 Номер заказа: {resp["order_id"]} \n'
-                                                         f'👤 Имя заказчика: {resp["sender_name"]} \n'
-                                                         f'📲 Номер заказчик: {resp["sender_phone"]} \n'
-                                                         f'💵 Стоимость заказа: {resp["cost_of_service_with_vat"]} UZS\n'
-                                                         f'💸 Начисленная сумма: {resp["cashback"]} UZS \n'
-                                                         f'🤩 Процент кэшбэка: {resp["percent"]}',
-                                   reply_markup=keys.back)
-
-
-            #await bot.send_message(message.from_user.id,
-            #                        'За этот накладной кэшбэк получен, отправь другой накладной',
-            #                        parse_mode="Markdown")
+            if len(resp) == 1:
+                await bot.send_message(message.from_user.id, '🥲 Извините, мы даем кэшбек с накладным числом от'
+                                                             ' 15.06.2022',
+                                       reply_markup=keys.back)
+            else:
+                ress = await asyncRequests.invoice_create(chat_id=resp['telegram_chat_id'], number=resp['order_id'])
+                await bot.send_message(message.from_user.id, f'🥳 Поздравляем! Кэшбэк получен успешно!.\n'
+                                                             f'📦 Номер заказа: {resp["order_id"]} \n'
+                                                             f'👤 Имя заказчика: {resp["sender_name"]} \n'
+                                                             f'📲 Номер заказчик: {resp["sender_phone"]} \n'
+                                                             f'💵 Стоимость заказа: {resp["cost_of_service_with_vat"]} UZS\n'
+                                                             f'💸 Начисленная сумма: {resp["cashback"]} UZS \n'
+                                                             f'🤩 Процент кэшбэка: {resp["percent"]}',
+                                       reply_markup=keys.back)
     else:
         await bot.send_message(message.from_user.id, payload, parse_mode="Markdown")
-
-    # print(r.text)
-    # print(r.url)
-    # await bot.send_message(message.from_user.id, r.text)
-
 
 #                                                 OBRABOTKA KNOPOK
 
@@ -157,12 +131,16 @@ async def balancedone(message: types.Message):
         if len(resp) < 4:
             await bot.send_message(message.from_user.id, '🥲 Вы ещё не получили кэшбэк.', reply_markup=keys.back)
         else:
-            await bot.send_message(message.from_user.id, f"👤 Имя: {resp['name']} \n"
-                                                         f"📲 Номер: {resp['phone']} \n"
-                                                         f"💰 Баланс: {resp['cashback']} UZS \n"
-                                                         f"🆔 Ваш ID: {pk}", reply_markup=keys.back)
+            qr_decode.qr_generate(message.from_user.id)
+            photo = InputFile(f"user_qr/{message.from_user.id}.png")
+            await bot.send_photo(message.from_user.id, photo, caption=f"👤 Имя: {resp['name']} \n"
+                                                                      f"📲 Номер: {resp['phone']} \n"
+                                                                      f"💰 Баланс: {resp['cashback']} UZS \n"
+                                                                      f"🆔 Ваш ID: {pk}", reply_markup=keys.back)
+            os.remove(f"user_qr/{message.from_user.id}.png")
     else:
-        await bot.send_message(message.from_user.id, '😉 Для начала подпишитесь на наш Telegram-канал', reply_markup=nav.checkSubMenu)
+        await bot.send_message(message.from_user.id, '😉 Для начала подпишитесь на наш Telegram-канал',
+                               reply_markup=nav.checkSubMenu)
 
 
 @dp.message_handler(lambda message: message.text == "📄 История транзакций", state=Form.Menu)
@@ -186,7 +164,8 @@ async def historydone(message: types.Message):
         except:
             await bot.send_message(message.from_user.id, '🥲 Вы ещё не получили кэшбэк.', reply_markup=keys.back)
     else:
-        await bot.send_message(message.from_user.id, '😉 Для начала подпишитесь на наш Telegram-канал', reply_markup=nav.checkSubMenu)
+        await bot.send_message(message.from_user.id, '😉 Для начала подпишитесь на наш Telegram-канал',
+                               reply_markup=nav.checkSubMenu)
 
 
 @dp.message_handler(lambda message: message.text == '🔙 Назад', state='*')

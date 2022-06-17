@@ -1,7 +1,7 @@
 from pyzbar.pyzbar import decode
 from PIL import Image
 import os
-
+import qrcode
 
 # import sys, qrcode
 # from qrcode import QRCode
@@ -56,3 +56,9 @@ def decoder(name):
         word = '❌ Отправьте отчётливое фото'
         str(word)
         return word
+
+
+def qr_generate(user_id):
+    img = qrcode.make(user_id)
+    type(img)  # qrcode.image.pil.PilImage
+    img.save(f"user_qr/{user_id}.png")
