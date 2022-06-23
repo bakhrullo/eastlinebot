@@ -44,17 +44,17 @@ import qrcode
 #         return error
 
 def decoder(name):
+    word = '❌ Отправьте отчётливое фото'
     try:
         decode_qr = decode(Image.open(f'test/{name}.jpg'))
         print(decode_qr[0].data.decode('ascii'))
         code = decode_qr[0].data.decode('ascii')
         print(int(code))
         os.remove(f'test/{name}.jpg')
-        return code
-
+        if len(code) == 12 and code.isdigit():
+            return code
+        return word
     except:
-        word = '❌ Отправьте отчётливое фото'
-        str(word)
         return word
 
 
